@@ -2,13 +2,11 @@ import os
 import json
 from typing import TypedDict, List
 
-from langchain_huggingface import HuggingFaceEmbeddings
-
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_tavily import TavilySearch
 from langgraph.graph import StateGraph, END
 from pydantic import BaseModel, Field
 
+from core.llm import get_llm, get_embeddings
 from core.database import SessionLocal, KnowledgeItem, init_db
 
 from dotenv import load_dotenv
@@ -54,21 +52,8 @@ def extraction_node(state: ResearchState) -> ResearchState:
     """Uses LLM to read the raw text and pick out FACTS."""
     print("--- EXTRACTING FACTS ---")
     # github models    
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        api_key=os.getenv("GITHUB_TOKEN"),      
-        base_url=os.getenv("OPENAI_BASE_URL"), 
-        temperature=0
-    )
+    llm = get_llm()
 
-    # # ollama models
-    # llm = ChatOpenAI(
-    #     model="gemma3:4b",    
-    #     api_key=os.getenv("OPENAI_API_KEY"),
-    #     base_url=os.getenv("OPENAI_BASE_URL"), 
-    #     temperature=0
-    # )
-    
     # STRUCTURED OUTPUT: Force the AI to give us JSON, not text.
     class FactSchema(BaseModel):
         fact: str = Field(description="A concise financial rule, rate, concept or definition.")
@@ -98,7 +83,7 @@ def save_node(state: ResearchState) -> ResearchState:
     session = SessionLocal()
     
     # FREE LOCAL EMBEDDINGS
-    embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    embeddings_model = get_embeddings()
     
     saved_count = 0
     for item in state['extracted_facts']:
