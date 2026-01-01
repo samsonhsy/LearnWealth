@@ -1,4 +1,3 @@
-import os
 import json
 from typing import TypedDict, List
 
@@ -8,11 +7,6 @@ from pydantic import BaseModel, Field
 
 from core.llm import get_llm, get_embeddings
 from core.database import SessionLocal, KnowledgeItem, init_db
-
-from dotenv import load_dotenv
-
-
-load_dotenv()
 
 # We limit search to these domains to ensure "Trusted" HK content
 SAFE_DOMAINS = [
@@ -124,7 +118,7 @@ if __name__ == "__main__":
     
     # Define topics you want to learn about
     topics_to_learn = [
-        "Basic infomation of insurance in Hong Kong",
+        "Basic infomation of MPF in Hong Kong",
     ]
         # "MPF mandatory contribution rules Hong Kong"
         # "Hong Kong Deposit Protection Scheme limit",
