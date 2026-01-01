@@ -1,10 +1,10 @@
 import os
-from sqlalchemy import create_engine, Column, Integer, String, Text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-from pgvector.sqlalchemy import Vector
 from dotenv import load_dotenv
 from sqlalchemy import text
 
+from core.llm import get_embeddings
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -12,16 +12,12 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
 
-class KnowledgeItem(Base):
-    __tablename__ = "knowledge_items"
-
-    id = Column(Integer, primary_key=True)
-    topic = Column(String)
-    fact_text = Column(Text)
-    source_url = Column(String)
-    
-    # "all-MiniLM-L6-v2" uses 384 dimensions
-    embedding = Column(Vector(384)) 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 def init_db():
     with engine.connect() as conn:
