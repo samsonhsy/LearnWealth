@@ -1,7 +1,6 @@
-# # app/routers/admin_key.py
 from fastapi import APIRouter, Depends
 
-from agents.syllabus_agent.py import generate_syllabus
+from agents.syllabus_agent import generate_syllabus as generate_syllabus_from_agent
 from models.curriculum import Course, Section
 from sqlalchemy.orm import Session
 from core.database import get_db
@@ -9,13 +8,13 @@ from core.database import get_db
 router = APIRouter()
 
 @router.post("/admin/generate-syllabus")
-def api_generate_syllabus(topic: str):
+def generate_syllabus_endpoint(topic: str):
     """AI brainstorms the syllabus structure."""
-    draft = generate_syllabus(topic)
+    draft = generate_syllabus_from_agent(topic)
     return draft
 
 @router.post("/admin/create-course")
-def api_create_course(course_data: dict, db: Session = Depends(get_db)):
+def create_course(course_data: dict, db: Session = Depends(get_db)):
     """Admin approves and saves to DB."""
     
     new_course = Course(
