@@ -1,5 +1,5 @@
 # # app/routers/admin_key.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 
 from agents.syllabus_agent.py import generate_syllabus
 from models.curriculum import Course, Section
