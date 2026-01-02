@@ -14,4 +14,5 @@ async def read_root():
     return {"message": "Welcome to the WealthLearn-backend API!"}
 
 app.include_router(auth.router, prefix="/syllabus", tags=["Syllabus"])
+app.include_router(auth.router, prefix="/course-content", tags=["Course Content"])
 
