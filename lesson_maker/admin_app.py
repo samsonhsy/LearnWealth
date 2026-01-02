@@ -35,11 +35,11 @@ def set_section_draft(section_id: int, draft: dict):
 st.sidebar.title("LearnWealth Admin")
 page = st.sidebar.radio("Navigation", ["Dashboard", "Course Factory", "Content Studio"])
 
-# PAGE 1: DASHBOARD (The "Pitch" Screen)
+# DASHBOARD PAGE
 if page == "Dashboard":
     st.title("📊 Platform Overview")
     
-    # Mock Data for Hackathon Visuals
+    # Mock Data
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Active Students", "1,240", "+12%")
     col2.metric("Courses Generated", "8", "+2 this week")
@@ -61,17 +61,17 @@ if page == "Dashboard":
         st.bar_chart({"Gaming": 45, "Science": 30, "Art": 15, "History": 10})
 
 
-# PAGE 2: COURSE FACTORY (Syllabus Agent)
+# COURSE FACTORY PAGE(Syllabus Agent)
 elif page == "Course Factory":
     st.title("🏗️ Course Factory")
-    st.markdown("Use **Layer 1 AI** to brainstorm course structures.")
+    st.markdown("Use **Syllabus Agent** to brainstorm course structures.")
 
-    # 1. INPUT
+    # TOPIC INPUT
     with st.form("syllabus_form"):
         topic = st.text_input("Enter Topic Name", placeholder="e.g. Student Credit Cards in Hong Kong")
-        submitted = st.form_submit_button("🤖 Generate Syllabus")
+        submitted = st.form_submit_button("Generate Syllabus")
 
-    # 2. STATE MANAGEMENT
+    # STATE MANAGEMENT
     if "syllabus_draft" not in st.session_state:
         st.session_state["syllabus_draft"] = None
 
@@ -84,7 +84,7 @@ elif page == "Course Factory":
             else:
                 st.error("Error generating syllabus.")
 
-    # 3. EDITOR & SAVE
+    # EDITOR & SAVE
     if st.session_state["syllabus_draft"]:
         st.divider()
         st.subheader("Review & Edit")
@@ -114,10 +114,10 @@ elif page == "Course Factory":
             else:
                 st.error("Failed to save.")
 
-# PAGE 3: CONTENT STUDIO (Research & Author Agents)
+# CONTENT STUDIO PAGE (Research & Author Agents)
 elif page == "Content Studio":
     st.title("✍️ Content Studio")
-    st.markdown("Use **Layer 2 & 3 AI** to research and write 'Master Content'.")
+    st.markdown("Use **Research Agent and Author Agent** to research and write 'Master Content'.")
     
     # 1. SELECT COURSE
     courses = fetch_courses()
