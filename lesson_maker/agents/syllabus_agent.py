@@ -1,7 +1,6 @@
 from typing import List
 from pydantic import BaseModel, Field
-from langchain_openai import ChatOpenAI
-from backend.core.llm import get_llm
+from core.llm import get_llm
 
 class SectionDraft(BaseModel):
     title: str = Field(description="Title of the lesson section")

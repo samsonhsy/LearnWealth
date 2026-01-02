@@ -6,7 +6,8 @@ from langgraph.graph import StateGraph, END
 from pydantic import BaseModel, Field
 
 from core.llm import get_llm, get_embeddings
-from core.database import SessionLocal, KnowledgeItem, init_db
+from core.database import SessionLocal
+from models.knowledge_base import KnowledgeItem
 
 # We limit search to these domains to ensure "Trusted" HK content
 SAFE_DOMAINS = [
@@ -111,31 +112,19 @@ workflow.add_edge("save", END)
 
 research_app = workflow.compile()
 
-# if __name__ == "__main__":
-#     # Initialize the Database (Create tables if missing)
-#     print("Initializing Database...")
-#     init_db()
+def run_research(topic: str) -> dict:
+    """Runs the Research Agent workflow."""
+    initial_state: ResearchState = {
+        "topic": topic,
+        "raw_content": "",
+        "extracted_facts": [],
+        "logs": []
+    }
     
-#     # Define topics you want to learn about
-#     topics_to_learn = [
-#         "Basic infomation of MPF in Hong Kong",
-#     ]
-#         # "MPF mandatory contribution rules Hong Kong"
-#         # "Hong Kong Deposit Protection Scheme limit",
-#         # "Average inflation rate Hong Kong 2024",
-#         # "Compound interest definition",
-#         # "Hong Kong Stock Exchange basic trading rules"
-
-#     # Run the Agent for each topic
-#     for topic in topics_to_learn:
-#         print(f"\n\n>>> PROCESSING TOPIC: {topic}")
-#         initial_state = {"topic": topic, "logs": []}
-#         research_app.invoke(initial_state)
-
-#     # Verify Data
-#     print("\n\n>>> VERIFICATION: Reading from DB...")
-#     session = SessionLocal()
-#     items = session.query(KnowledgeItem).all()
-#     for item in items:
-#         print(f"[{item.topic}] {item.fact_text[:50]}... (Source: {item.source_url})")
-#     session.close()
+    final_state = research_app.invoke(initial_state)
+    return {
+        "status": "completed",
+        "topic": topic,
+        "facts_saved": len(final_state['extracted_facts']),
+        "logs": final_state['logs']
+    }

@@ -1,11 +1,10 @@
 from typing import TypedDict, List
-from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, END
 from pydantic import BaseModel, Field
 
-from backend.core.database import SessionLocal
-from backend.models.knowledge import KnowledgeItem
-from backend.core.llm import get_embeddings, get_llm
+from core.database import SessionLocal
+from models.knowledge_base import KnowledgeItem
+from core.llm import get_embeddings, get_llm
 
 class QuizQuestionSchema(BaseModel):
     question: str = Field(description="The question text")
