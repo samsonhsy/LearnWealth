@@ -6,17 +6,31 @@ from agents.author_agent import run_author_agent
 from models.curriculum import Section, QuizQuestion
 from sqlalchemy.orm import Session
 from core.database import get_db
+from models.curriculum import Course
 
 router = APIRouter()
 
+@router.get("/admin/courses")
+def get_courses(db: Session = Depends(get_db)):
+    """List all courses to populate the dropdown menu."""
+    courses = db.query(Course).all()
+    # Return simple list for UI
+    return [{"id": c.id, "title": c.title} for c in courses]
+
+@router.get("/admin/course/{course_id}/sections")
+def get_sections(course_id: int, db: Session = Depends(get_db)):
+    """List sections for a specific course."""
+    sections = db.query(Section).filter(Section.course_id == course_id).order_by(Section.order_index).all()
+    return sections
+
 @router.post("/admin/research")
-def api_research_topic(topic: str):
+def research_topic(topic: str):
     """Scrapes web and saves to Vector DB (KnowledgeItem)"""
     result = run_research(topic)
     return result
 
 @router.post("/admin/draft-section-content/{section_id}")
-def api_draft_section_content(section_id: int, db: Session = Depends(get_db)):
+def draft_section_content(section_id: int, db: Session = Depends(get_db)):
     """
     Returns the Content + Quizzes for the Admin to Review/Edit.
     Does NOT save to DB yet.
@@ -39,7 +53,7 @@ class SaveContentRequest(BaseModel):
     quiz_data: List[dict]
 
 @router.post("/admin/save-section-content/{section_id}")
-def api_save_section_content(
+def save_section_content(
     section_id: int, 
     payload: SaveContentRequest, 
     db: Session = Depends(get_db)
