@@ -145,7 +145,7 @@ elif page == "Content Studio":
 
     bulk_col1, bulk_col2, bulk_col3 = st.columns(3)
     with bulk_col1:
-        if st.button("🔍 Research ALL sections", use_container_width=True):
+        if st.button("🔍 Research ALL sections", width="stretch"):
             with st.spinner("Scraping for every section..."):
                 successes, failures = 0, []
                 for s in sections:
@@ -161,7 +161,7 @@ elif page == "Content Studio":
                     st.error(f"Failed: {', '.join(failures)}")
 
     with bulk_col2:
-        if st.button("✨ Generate drafts for ALL sections", use_container_width=True):
+        if st.button("✨ Generate drafts for ALL sections", width="stretch"):
             with st.spinner("Generating drafts for every section..."):
                 successes, failures = 0, []
                 for s in sections:
@@ -178,7 +178,7 @@ elif page == "Content Studio":
                     st.error(f"Failed: {', '.join(failures)}")
 
     with bulk_col3:
-        if st.button("💾 Publish ALL drafts", use_container_width=True):
+        if st.button("💾 Publish ALL drafts", width="stretch"):
             with st.spinner("Publishing all available drafts..."):
                 successes, failures = 0, []
                 for s in sections:
