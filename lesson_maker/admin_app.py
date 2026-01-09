@@ -98,7 +98,7 @@ elif page == "Course Factory":
         # Sections Editor
         st.write("### Sections Plan")
         sections_df = pd.DataFrame(draft['sections'])
-        edited_df = st.data_editor(sections_df, num_rows="dynamic", use_container_width=True)
+        edited_df = st.data_editor(sections_df, num_rows="dynamic", width="stretch")
         
         if st.button("💾 Save to Database"):
             # Construct Payload
