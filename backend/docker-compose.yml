@@ -1,0 +1,29 @@
+services:
+  # Name of our service
+  db:
+    # The official Postgres image that already has pgvector installed
+    image: pgvector/pgvector:pg16
+    
+    # Container Name: Easier to find in your terminal
+    container_name: hackathon_db
+    
+    # Environment Variables: Passwords and setup (Safe for hackathons, bad for production)
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: financial_db
+      
+    # Ports: The Bridge
+    ports:
+      - "5432:5432"
+      
+    # Volumes: The Persistence Layer
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+      
+    # Healthcheck: Checks if DB is ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d financial_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

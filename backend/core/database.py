@@ -1,0 +1,26 @@
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+from dotenv import load_dotenv
+from sqlalchemy import text
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine)
+Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def init_db():
+    with engine.connect() as conn:
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        conn.commit()
+    Base.metadata.create_all(engine)
+    
