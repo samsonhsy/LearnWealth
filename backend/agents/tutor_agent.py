@@ -3,131 +3,90 @@ from langgraph.graph import StateGraph, END
 from pydantic import BaseModel, Field
 import json
 
-from core.database import search_knowledge_base
 from core.llm import get_llm
 
+# --- SCHEMAS ---
+class AdaptedQuiz(BaseModel):
+    question: str = Field(description="The rewritten question using the metaphor")
+    options: List[str] = Field(description="List of options (metaphor-adjusted if needed)")
+    correct_answer: str = Field(description="The correct answer")
+    explanation: str = Field(description="Explanation linking the metaphor to the financial fact")
+
 class TutorState(TypedDict):
-    user_query: str         # e.g., "What is MPF?"
-    user_interest: str      # e.g., "Chinese History"
-    retrieved_fact: str     # Data from DB
-    tutorial_content: str   # The final explanation
-    quiz_json: dict         # The generated question
+    # Inputs
+    master_content: str
+    master_quiz: dict # {question: "", correct: "", options: []}
+    user_interest: str # e.g. "Biology"
+    
+    # Outputs
+    personalized_content: str
+    personalized_quiz: dict
 
-def retrieve_node(state: TutorState):
-    """Finds the best fact from the database."""
-    print(f"--- RETRIEVING INFO FOR: {state['user_query']} ---")
+def style_transfer_node(state: TutorState):
+    """Rewrites content using a metaphor."""
+    print(f"--- [Tutor] Personalizing for {state['user_interest']} ---")
     
-    results = search_knowledge_base(state['user_query'], limit=1)
-    
-    if not results:
-        fact = "Sorry, I don't have information on that topic in my trusted database."
-    else:
-        # We assume the top result is the best one
-        item = results[0]
-        fact = f"Concept: {item.topic}\nFact: {item.fact_text}\nSource: {item.source_url}"
-        
-    return {"retrieved_fact": fact}
-
-def analogy_node(state: TutorState):
-    """The Creative Writer: Rewrites the fact using the interest."""
-    print(f"--- GENERATING ANALOGY ({state['user_interest']}) ---")
-    
-    llm = get_llm(temperature=0.7) # Higher temp for creativity
+    llm = get_llm(temperature=0.7) # Creativity allowed here
     
     prompt = f"""
-    You are a Financial Tutor for a student who loves {state['user_interest']}.
+    You are a Personal Tutor for a student who loves: {state['user_interest']}.
     
-    OBJECTIVE: Explain the following Financial Fact using a metaphor related to {state['user_interest']}.
+    ORIGINAL LESSON:
+    {state['master_content']}
     
-    THE FACT:
-    {state['retrieved_fact']}
+    TASK:
+    Rewrite this lesson to be engaging. Use a specific metaphor from {state['user_interest']} to explain the concept.
     
-    CONSTRAINTS:
-    - Keep it under 150 words.
-    - Be encouraging and fun, with emojis.
-    - Do not lose the accuracy of the financial rule (e.g. if it says 5%, mention 5%).
+    RULES:
+    1. Keep financial numbers/facts ACCURATE (do not change 5% to 10%).
+    2. Use emojis.
+    3. Keep it under 200 words.
     """
     
     response = llm.invoke(prompt)
-    return {"tutorial_content": response.content}
+    return {"personalized_content": response.content}
 
-def quiz_node(state: TutorState):
-    """The Examiner: Creates a quiz based on the specific analogy used."""
-    print("--- GENERATING QUIZ ---")
+def quiz_adapter_node(state: TutorState):
+    """Rewrites the quiz to match the new metaphor."""
+    print("--- [Tutor] Adapting Quiz ---")
     
-    llm = get_llm()
-    
-    class QuizSchema(BaseModel):
-        question: str = Field(description="The question text")
-        options: List[str] = Field(description="List of 3 possible answers")
-        correct_answer: str = Field(description="The correct answer text")
-        explanation: str = Field(description="Why it is correct")
-
-    structured_llm = llm.with_structured_output(QuizSchema)
+    llm = get_llm(temperature=0)
+    structured_llm = llm.with_structured_output(AdaptedQuiz)
     
     prompt = f"""
-    Based on the following tutorial, create 1 Multiple Choice Question to test understanding.
+    We have rewritten a lesson using a "{state['user_interest']}" metaphor.
+    Now, rewrite the Original Quiz to fit that metaphor.
     
-    TUTORIAL TEXT:
-    {state['tutorial_content']}
+    ORIGINAL QUESTION: {state['master_quiz']['question_text']}
+    ORIGINAL ANSWER: {state['master_quiz']['correct_answer']}
+    ORIGINAL OPTIONS: {state['master_quiz']['distractors']}
     
-    REQUIREMENT:
-    - Use the same metaphor (e.g. if they talked about cells, ask about cells).
-    - Ensure one answer is clearly correct based on the financial fact.
+    NEW LESSON CONTEXT:
+    {state['personalized_content']}
+    
+    TASK:
+    Create a new question that tests the same concept but uses the language of the new lesson.
+    The logic of the correct answer must remain the same.
     """
     
-    quiz_result = structured_llm.invoke(prompt)
-    
-    # Convert to dict for State
-    return {"quiz_json": quiz_result.model_dump()}
+    result = structured_llm.invoke(prompt)
+    return {"personalized_quiz": result.model_dump()}
 
-# BUILD THE GRAPH
 workflow = StateGraph(TutorState)
+workflow.add_node("style_transfer", style_transfer_node)
+workflow.add_node("adapt_quiz", quiz_adapter_node)
 
-workflow.add_node("retrieve", retrieve_node)
-workflow.add_node("personalize", analogy_node)
-workflow.add_node("generate_quiz", quiz_node)
-
-workflow.set_entry_point("retrieve")
-workflow.add_edge("retrieve", "personalize")
-workflow.add_edge("personalize", "generate_quiz")
-workflow.add_edge("generate_quiz", END)
+workflow.set_entry_point("style_transfer")
+workflow.add_edge("style_transfer", "adapt_quiz")
+workflow.add_edge("adapt_quiz", END)
 
 tutor_app = workflow.compile()
 
-if __name__ == "__main__":
-    # Ensure your DB has data from Phase 2 first!
-    
-    def run_demo(user_query, user_interest):
-        print(f"\n{'='*40}")
-        print(f"USER: {user_interest} | ASKING: {user_query}")
-        print(f"{'='*40}")
-        
-        initial_state = {
-            "user_query": user_query,
-            "user_interest": user_interest
-        }
-        
-        # Run the Agent
-        result = tutor_app.invoke(initial_state)
-        
-        print("\n>>> 1. RETRIEVED FACT:")
-        print(result['retrieved_fact'])
-        
-        print("\n>>> 2. PERSONALIZED TUTORIAL:")
-        print(result['tutorial_content'])
-        
-        print("\n>>> 3. QUIZ:")
-        print(json.dumps(result['quiz_json'], indent=2, ensure_ascii=False))
-
-    # # Scenario A: The Science Student
-    # run_demo(
-    #     user_query="What is MPF?", 
-    #     user_interest="Biology and Evolution"
-    # )
-    
-    # Scenario B: The History Student
-    run_demo(
-        user_query="Basic infomation of insurance in Hong Kong", 
-        user_interest="Chinese Dynasties and War"
-    )
+def run_tutor_agent(content: str, quiz: dict, interest: str):
+    """Wrapper to run the agent"""
+    initial_state = {
+        "master_content": content,
+        "master_quiz": quiz,
+        "user_interest": interest
+    }
+    return tutor_app.invoke(initial_state)
