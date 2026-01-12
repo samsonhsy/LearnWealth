@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, JSON, TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, JSON, TIMESTAMP, func, ForeignKey, Boolean, Text
+from sqlalchemy.orm import relationship
 from core.database import Base
 
 class User(Base):
@@ -18,4 +19,21 @@ class User(Base):
     account_tier = Column(String, default="free")
 
     # Progress Tracking
-    completed_sections = Column(JSON) 
+    progress = relationship("StudentProgress", back_populates="user")
+
+class StudentProgress(Base):
+    __tablename__ = "student_progress"
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    section_id = Column(Integer, ForeignKey("sections.id"))
+    
+    # Status
+    is_completed = Column(Boolean, default=False)
+    quiz_score = Column(Integer, default=0)
+    
+    # THE CACHE: Save the AI's output here so we load it instantly next time
+    personalized_content = Column(Text) 
+    personalized_quiz = Column(JSON) 
+    
+    user = relationship("User", back_populates="progress")
