@@ -15,6 +15,7 @@ class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str
+    interests: str
 
 class UserOutput(BaseModel):
     username: str
