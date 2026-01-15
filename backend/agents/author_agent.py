@@ -80,14 +80,14 @@ def draft_node(state: AuthorState):
     return {"master_content": response.content}
 
 def quiz_node(state: AuthorState):
-    """Generates 1 to 3 Questions based on the Draft."""
+    """Generates 1 Question based on the Draft."""
     print("--- [Author] Generating Quiz ---")
     
     llm = get_llm(temperature=0, model_name="gpt-4o-mini")
     structured_llm = llm.with_structured_output(QuizList)
     
     prompt = f"""
-    Based STRICTLY on the tutorial text below, generate 2 Multiple Choice Questions.
+    Based STRICTLY on the tutorial text below, generate 1 Multiple Choice Question.
     
     TUTORIAL:
     "{state['master_content']}"
