@@ -62,28 +62,117 @@ page = st.sidebar.radio("Navigation", ["Dashboard", "Course Factory", "Content S
 
 # DASHBOARD PAGE
 if page == "Dashboard":
-    st.title("📊 Platform Overview")
-    
-    # Mock Data
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Active Students", "1,240", "+12%")
-    col2.metric("Courses Generated", "8", "+2 this week")
-    col3.metric("Quizzes Taken", "8,921", "+5%")
-    col4.metric("Avg. Knowledge Gain", "24%", "Pre vs Post")
+    st.title("📊 Dashboard")
+    st.caption("Prototype KPIs to showcase traction, learning outcomes, and funnel health for investors.")
+
+    # --- TOP-LEVEL KPI CARDS ---
+    primary_metrics = [
+        ("App Downloads", "3,980", "+240 new"),
+        ("Active Students", "1,240", "+12% vs last week"),
+        ("Course Completions", "312", "+18%"),
+        ("Quiz Accuracy", "79%", "+4 pts"),
+    ]
+
+    cols = st.columns(len(primary_metrics))
+    for col, (label, value, delta) in zip(cols, primary_metrics):
+        col.metric(label, value, delta)
 
     st.divider()
-    
-    c1, c2 = st.columns([2, 1])
-    with c1:
-        st.subheader("Student Engagement (Last 7 Days)")
-        chart_data = pd.DataFrame({
-            "Daily Users": [120, 132, 145, 150, 170, 210, 245]
-        }, index=["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
-        st.line_chart(chart_data)
-    
-    with c2:
-        st.subheader("Popular Interests")
-        st.bar_chart({"Gaming": 45, "Science": 30, "Art": 15, "History": 10})
+
+    # --- GROWTH & ACQUISITION SNAPSHOT ---
+    acquisition_cols = st.columns([2, 1])
+    with acquisition_cols[0]:
+        st.subheader("Acquisition funnel (last 7 days)")
+        funnel_index = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        funnel_df = pd.DataFrame(
+            {
+                "App Downloads": [210, 225, 240, 260, 320, 410, 470],
+                "New Signups": [150, 162, 170, 188, 230, 305, 330],
+                "Activated Learners": [120, 130, 138, 155, 190, 248, 260],
+            },
+            index=funnel_index,
+        )
+        st.area_chart(funnel_df)
+
+    with acquisition_cols[1]:
+        st.subheader("Download conversion")
+        st.metric("Download → Signup Rate", "71%", "+5 pts")
+        st.progress(0.71)
+        st.caption("Daily target: 65%")
+
+        channels_df = pd.DataFrame(
+            {
+                "Channel": ["Play Store", "App Store", "Web Landing", "Campus Reps"],
+                "Downloads": [1980, 1225, 480, 295],
+                "Conversion": ["42%", "38%", "55%", "61%"],
+            }
+        )
+        st.dataframe(channels_df, width='stretch')
+
+    st.divider()
+
+    # --- LEARNING HEALTH ---
+    learning_cols = st.columns([1.5, 1, 1])
+    with learning_cols[0]:
+        st.subheader("Student Engagement")
+        engagement_df = pd.DataFrame(
+            {
+                "Daily Active Students": [120, 132, 145, 150, 170, 210, 245],
+                "Lessons Completed": [80, 88, 102, 110, 129, 160, 185],
+            },
+            index=["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        )
+        st.line_chart(engagement_df)
+
+    with learning_cols[1]:
+        st.subheader("Top Courses")
+        top_courses_df = pd.DataFrame(
+            [
+                {"Course": "Smart Budgeting", "Avg. Score": "81%", "Completion": "78%"},
+                {"Course": "Credit Basics HK", "Avg. Score": "76%", "Completion": "65%"},
+                {"Course": "Investing 101", "Avg. Score": "83%", "Completion": "71%"},
+                {"Course": "Gen Z Retirement", "Avg. Score": "74%", "Completion": "59%"},
+            ]
+        )
+        st.dataframe(top_courses_df, width="stretch", hide_index=True)
+
+    with learning_cols[2]:
+        st.subheader("Download vs. Retention")
+        retention_df = pd.DataFrame(
+            {
+                "Metric": ["30-day retention", "Weekly downloads", "Monthly ARPU"],
+                "Value": ["52%", "5.2k", "$18"],
+                "Target": ["48%", "4.5k", "$15"],
+            }
+        )
+        st.table(retention_df)
+
+    st.divider()
+
+    st.subheader("Learner Demand & Support Health")
+    interest_cols = st.columns([2, 1])
+    with interest_cols[0]:
+        st.caption("Top content requests from in-app polls")
+        content_demand_df = pd.DataFrame(
+            [
+                {"Topic": "Crypto Safety", "Weekly Requests": 182, "WoW Growth": "+34%"},
+                {"Topic": "Student Loans", "Weekly Requests": 156, "WoW Growth": "+18%"},
+                {"Topic": "ETF Investing", "Weekly Requests": 139, "WoW Growth": "+12%"},
+                {"Topic": "Sustainable Finance", "Weekly Requests": 95, "WoW Growth": "+9%"},
+                {"Topic": "Side Hustles", "Weekly Requests": 87, "WoW Growth": "+5%"},
+            ]
+        )
+        st.dataframe(content_demand_df, width="stretch", hide_index=True)
+
+    with interest_cols[1]:
+        st.caption("Support automation & escalations")
+        support_cards = st.columns(2)
+        support_cards[0].metric("Automation deflection", "78%", "+9 pts")
+        support_cards[1].metric("Open escalations", "14", "-6 vs last week")
+
+        st.progress(0.62, text="Tickets resolved by tutor agent (goal 60%)")
+
+        
 
 
 # COURSE FACTORY PAGE(Syllabus Agent)
