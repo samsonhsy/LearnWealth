@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from core.security import create_access_token
 from core.database import get_db
@@ -17,11 +17,11 @@ class Token(BaseModel):
     token_type: str
 
 @router.post("/token", response_model=Token, status_code=status.HTTP_200_OK)
-async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm,Depends()], db: AsyncSession = Depends(get_db)
+def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm,Depends()], db: Session = Depends(get_db)
 ):
     '''Authenticate user and return access token'''
-    user = await authenticate_user(form_data.username, form_data.password, db)
+    user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
