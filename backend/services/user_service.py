@@ -1,8 +1,7 @@
-import asyncio
 from typing import Optional
 from pydantic import BaseModel, EmailStr
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from sqlalchemy.future import select
 
 from models.user import User
@@ -14,33 +13,33 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
-async def get_users(db: AsyncSession) -> Optional[list[User]]:
-    result = await db.execute(select(User))
+def get_users(db: Session) -> Optional[list[User]]:
+    result = db.execute(select(User))
     return result.scalars().all()
 
-async def get_user_by_id(db: AsyncSession, user_id: int) -> Optional[User]:
-    result = await db.execute(select(User).filter(User.id == user_id))
+def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
+    result = db.execute(select(User).filter(User.id == user_id))
     return result.scalars().first()
 
-async def get_user_by_email(db: AsyncSession, email: str) -> Optional[User]:
-    result = await db.execute(select(User).filter(User.email == email))
+def get_user_by_email(db: Session, email: str) -> Optional[User]:
+    result = db.execute(select(User).filter(User.email == email))
     return result.scalars().first()
 
-async def get_user_by_username(db: AsyncSession, username: str) -> Optional[User]:
-    result = await db.execute(select(User).filter(User.username == username))
+def get_user_by_username(db: Session, username: str) -> Optional[User]:
+    result = db.execute(select(User).filter(User.username == username))
     return result.scalars().first()
 
-async def create_user(db: AsyncSession, user: UserCreate) -> User:
-    hashed_pwd = await asyncio.to_thread(get_pwd_hash, user.password)
-    db_user = User(username=user.username, email=user.email, hashed_pwd=hashed_pwd)
+def create_user(db: Session, user: UserCreate) -> User:
+    hashed_pwd = get_pwd_hash(user.password)
+    db_user = User(username=user.username, email=user.email, hashed_pwd=hashed_pwd, interests=user.interests)
     db.add(db_user)
-    await db.commit()
-    await db.refresh(db_user)
+    db.commit()
+    db.refresh(db_user)
     return db_user
 
-async def delete_user(db: AsyncSession, user_id: int):
-    db_user = (await db.execute(select(User).filter(User.id == user_id))).scalars().first()
+def delete_user(db: Session, user_id: int):
+    db_user = db.execute(select(User).filter(User.id == user_id)).scalars().first()
     if db_user:
-        await db.delete(db_user)
-        await db.commit()
+        db.delete(db_user)
+        db.commit()
     return
