@@ -8,7 +8,7 @@ export default function LearnView () {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-      fetchData('course_content/admin/courses/')
+      fetchData('/course_content/admin/courses/')
         .then(data => {
           setData(data);
           setLoading(false);
@@ -18,7 +18,7 @@ export default function LearnView () {
           setLoading(false);
         });
     }, []);
-  
+
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error loading data!</p>;
     return (
@@ -27,6 +27,7 @@ export default function LearnView () {
       <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4 lg:justify-center lg:items-center">
         This is the Learn page.
         <pre>{JSON.stringify(data, null, 2)}</pre>
+        <p>{data}</p>
       </div>
     </div>
   );

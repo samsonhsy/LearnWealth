@@ -84,5 +84,6 @@ export interface RegisterForm {
   email: string;
   password: string;
   confirmPassword: string;
-  interests: string;
+  interests: string[];
+  otherInterest: string;
 }

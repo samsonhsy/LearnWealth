@@ -16,7 +16,8 @@ export default function Register(props) {
         email: "",
         password: "",
         confirmPassword: "",
-        interests: "",
+        interests: [],
+        otherInterest: "",
     });
 
     const toggleForm = (field: keyof RegisterForm, value: string) => {
@@ -24,6 +25,22 @@ export default function Register(props) {
             ...form,
             [field]: value,
         });
+    }
+
+    const toggleFormInterest = (value: string) => {
+        if (form.interests.includes(value)) {  
+            setForm({
+                ...form,
+                interests: form.interests.filter(item => item !== value),
+            });
+        }
+        else
+        {        
+            setForm({
+                ...form,
+                interests: [...form.interests, value],
+            });
+        }
     }
 
     const handleUserInfo = (e: React.FormEvent) => {
@@ -41,10 +58,14 @@ export default function Register(props) {
 
     console.log("Register form data:", form);
 
-    const handleSubmit=async() =>{
+    const handleSubmit=async(e) =>{
+        e.preventDefault();
+        if (form.otherInterest && !form.interests.includes(form.otherInterest)) {
+            toggleFormInterest(form.otherInterest);
+        }
         console.log("Submitting registration form:", form);
 
-        if (form.interests.trim() === "") {
+        if (form.interests.length === 0) {
             notify('Please enter your interests', 'error');
             return;
         }
@@ -53,14 +74,18 @@ export default function Register(props) {
           username: form.username,
           email: form.email,
           password: form.password,
-          interests: form.interests,
+          interests: form.interests.join(","),
         };
         try{
-              const response = await axios.post("https://ctflife-demo.zeabur.app/users/", newUser);
+              const response = await axios.post("/users/register", newUser); 
+              console.log("User registered successfully:", response.data);
+              const data = response.data;
+
               notify('User Registered Successfully', 'success');
+              toggleView(View.HOME);
             } catch(error){
               console.error("Error occurred when registering user", error);
-              notify('User Was Not Registered', 'error');
+              notify('Registration failed. Please try again.', 'error');
           }
     };
 
@@ -68,7 +93,7 @@ export default function Register(props) {
         <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-900 text-white">
             <div className="w-full max-w-md ">
                 {!isInterest && <UserInfo handleUserInfo={handleUserInfo} form={form} toggleForm={toggleForm} />}
-                {isInterest && <Interest View={View} toggleView={toggleView}/>}
+                {isInterest && <Interest handleSubmit={handleSubmit} toggleForm={toggleForm} toggleFormInterest={toggleFormInterest}/>}
             </div>
         </div>
 

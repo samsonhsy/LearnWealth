@@ -43,6 +43,8 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Learn from './pages/Learn';
+import axios from 'axios';
+import { log } from 'console';
 
 // --- MOCK DATA ---
 export const INITIAL_USER: User = {
@@ -61,12 +63,6 @@ export const INITIAL_USER: User = {
   level: 4,
 };
 
-const MOCK_LESSONS: Lesson[] = [
-  { id: '1', title: 'Budgeting for Gamers', provider: 'HOY TV', thumbnail: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400', duration: '5:20', reward: 5, completed: false },
-  { id: '2', title: 'Smart Shopping at K11', provider: 'CTFS', thumbnail: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=400', duration: '3:45', reward: 5, completed: false },
-  { id: '3', title: 'Compound Interest', provider: 'HOY TV', thumbnail: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&q=80&w=400', duration: '6:10', reward: 5, completed: true },
-];
-
 const MOCK_REWARDS: RewardItem[] = [
   { id: 'r1', name: 'Giordano $50 Coupon', cost: 100, image: 'https://picsum.photos/200/200', description: 'Valid for any purchase over $200.' },
   { id: 'r2', name: 'K11 Art Mall Coffee', cost: 40, image: 'https://picsum.photos/201/200', description: 'Free coffee at participating cafes.' },
@@ -77,11 +73,6 @@ const MOCK_EVENTS: EventItem[] = [
   { id: 'e1', name: 'Financial Freedom Workshop', date: 'Oct 25, 2024', location: 'K11 Atelier', type: 'Workshop', spotsAvailable: 12, isRegistered: false },
   { id: 'e2', name: '施傅教學 - 入門理財班', date: 'Nov 02, 2024', location: 'CTF Center', type: 'Class', spotsAvailable: 5, isRegistered: false, price: 'FREE' },
   { id: 'e3', name: 'Gaming Assets Investment', date: 'Nov 15, 2024', location: 'Virtual', type: 'Featured', spotsAvailable: 100, isRegistered: false },
-];
-
-const QUIZ_DATA: QuizQuestion[] = [
-  { id: 1, question: "If you save $100 a month, how much do you have in a year?", options: ["$1000", "$1200", "$1500"], correctIndex: 1, explanation: "12 months x $100 = $1200." },
-  { id: 2, question: "Which is a 'Need'?", options: ["Latest iPhone", "Lunch", "Concert Tickets"], correctIndex: 1, explanation: "Food is essential for survival." },
 ];
 
 export default function App() {
@@ -96,18 +87,14 @@ export default function App() {
     { id: 't1', storeName: 'Starbucks', amount: 45, date: '2023-10-24', category: TransactionCategory.FOOD, isPartner: false },
     { id: 't2', storeName: 'Giordano', amount: 250, date: '2023-10-23', category: TransactionCategory.SHOPPING, isPartner: true },
   ]);
-  const [lessons, setLessons] = useState<Lesson[]>(MOCK_LESSONS);
   const [events, setEvents] = useState<EventItem[]>(MOCK_EVENTS);
   const [showNotification, setShowNotification] = useState<{msg: string, type: 'success' | 'error'} | null>(null);
 
   // Authentication & Customization State
-  const [loginForm, setLoginForm] = useState({ username: '', password: '', email: '' });
+  const [loginForm, setLoginForm] = useState({email: '' ,password: ''});
 
   const toggleLoginForm = (type, value) => {
-    if (type === 'username') {
-      setLoginForm(prev => ({...prev, username: value}));
-    }
-    else if (type === 'password') {
+    if (type === 'password') {
       setLoginForm(prev => ({...prev, password: value}));
     }
     else if (type === 'email') {
@@ -115,13 +102,10 @@ export default function App() {
     }
   }
 
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [language, setLanguage] = useState<'English' | 'Chinese'>('English');
 
   // Quiz & AI State
   const [activeQuiz, setActiveQuiz] = useState<Lesson | null>(null);
-  const [activeQuizQuestions, setActiveQuizQuestions] = useState<QuizQuestion[]>(QUIZ_DATA);
   const [quizStep, setQuizStep] = useState(0); 
   const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
 
@@ -140,14 +124,36 @@ export default function App() {
     setTimeout(() => setShowNotification(null), 3000);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  console.log(loginForm);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginForm.email || !loginForm.password) {
       notify("Please fill in credentials", "error");
       return;
     }
-    setUser({ ...INITIAL_USER, username: loginForm.username });
-    setView(View.HOME);
+    try{
+      const params = new URLSearchParams();
+      params.append('grant_type', 'password');
+      params.append('username', loginForm.email);
+      params.append('password', loginForm.password);
+      // If needed, add:
+      // params.append('scope', '');
+      // params.append('client_id', '');
+      // params.append('client_secret', '');
+      const response = await axios.post("/auth/token", params); 
+      console.log("User logged in successfully:", response.data);
+      const token = response.data;
+      console.log("Access Token:", token.access_token);
+      console.log("Token Type:", token.token_type);
+      notify('User Logged In Successfully', 'success');
+      toggleView(View.HOME);
+      // setUser({ ...INITIAL_USER, username: data.username });
+      setView(View.HOME);
+    } catch(error){
+      console.error("Error occurred when logging in ", error);
+      notify('Login failed. Please try again.', 'error');
+    }
   };
 
   const openBotAssist = (context: string) => {
@@ -351,10 +357,6 @@ export default function App() {
               </div>
             ) : quizStep === 1 ? (
               <div className="space-y-4">
-                 <p className="font-bold text-slate-800 mb-4">{activeQuizQuestions[0].question}</p>
-                 {activeQuizQuestions[0].options.map((opt, i) => (
-                    <button key={i} onClick={() => setQuizStep(2)} className="w-full text-left p-5 rounded-2xl border border-gray-100 hover:border-teal-500 hover:bg-teal-50 transition font-medium text-slate-600">{opt}</button>
-                 ))}
               </div>
             ) : (
               <div className="text-center">
@@ -375,7 +377,6 @@ export default function App() {
   const handleCompleteQuiz = () => {
     if (activeQuiz) {
       if (activeQuiz.id !== 'ai') {
-        setLessons(prev => prev.map(l => l.id === activeQuiz.id ? { ...l, completed: true } : l));
       }
       setUser(prev => ({ ...prev, kDollars: prev.kDollars + activeQuiz.reward }));
       notify(`Earned ${activeQuiz.reward} K$!`);
@@ -384,18 +385,11 @@ export default function App() {
     setQuizStep(0);
   };
 
-  const handleStartLesson = (lesson: Lesson) => {
-    setActiveQuiz(lesson);
-    setActiveQuizQuestions(QUIZ_DATA);
-    setQuizStep(0);
-  };
-
   const handleGenerateAiQuiz = async () => {
     setIsGeneratingQuiz(true);
     const questions = await generateQuizQuestions("saving and small investments");
     setIsGeneratingQuiz(false);
     if (questions && questions.length > 0) {
-      setActiveQuizQuestions(questions);
       setActiveQuiz({ id: 'ai', title: 'Dynamic AI Challenge', reward: 10, completed: false, provider: 'Gemini', thumbnail: '', duration: '' });
       setQuizStep(1);
     }
