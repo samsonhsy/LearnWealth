@@ -4,7 +4,9 @@ import pandas as pd
 import json
 
 # CONFIGURATION
-API_URL = "http://localhost:8000"  # Make sure your FastAPI is running here
+API_URL = "https://ctflife-demo.zeabur.app/"
+# API_URL = "http://localhost:8000"
+
 RESEARCH_FALLBACK_DOMAINS = [
     "ctflife.com.hk",
     "hkma.gov.hk",
