@@ -4,6 +4,8 @@ import { colors } from '@mui/material';
 import Button from '@mui/material/Button';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Logo from './logo.png';
+import { Scale } from 'lucide-react';
 
 export default function LoginView(props) {
     const { View, setView, handleLogin, toggleLogInForm, loginForm } = props;
@@ -12,9 +14,10 @@ export default function LoginView(props) {
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-900 text-white">
       <div className="w-full max-w-md bg-white text-gray-800 rounded-3xl shadow-2xl p-8">
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-teal-600 rounded-2xl flex items-center justify-center text-white font-black text-2xl">CTF</div>
+          <div className="w-16 h-16 bg-teal-600 rounded-2xl flex items-center justify-center text-white font-black text-2xl overflow-hidden"><img src={Logo} className='scale-150 transform-gpu' alt="app logo" /></div>
         </div>
-        <h1 className="text-2xl font-bold text-center mb-2">Welcome Back"</h1>
+        <div className="text-2xl font-bold text-center mb-2">因財C教</div>
+        <h1 className="text-2xl font-bold text-center mb-2">Welcome Back</h1>
         <p className="text-center text-gray-500 mb-8 text-sm">Empowering your financial future</p>
         
         <form onSubmit={handleLogin} className="space-y-4">
