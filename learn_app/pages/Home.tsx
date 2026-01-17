@@ -2,6 +2,7 @@
   import { INITIAL_USER } from "@/App";
   import { Bot, Gift, Handshake, PlayCircle } from "lucide-react";
   import { useEffect, useState } from "react";
+import ClipLoader from "react-spinners/ClipLoader";
 
   export default function HomeView (props) {
       const { user,setUser, eventNum, View, setView } = props;
@@ -21,8 +22,15 @@
             setLoading(false);
           });
       }, []);
-
-      if (loading) return <p>Loading...</p>;
+    
+    if (loading) return <div className="fixed inset-0 flex items-center justify-center bg-white">
+                            <ClipLoader 
+                                color="#009689" 
+                                loading={loading} 
+                                size={150} 
+                                aria-label="Loading Spinner" 
+                                data-testid="loader" />
+                        </div>
       if (error) return <p>Error loading data!</p>;
       return (
       <div className="p-4 space-y-6 pb-24">
@@ -51,7 +59,6 @@
           <button onClick={() => setView(View.LEARN)} className="bg-blue-600 p-6 rounded-3xl text-white shadow-lg shadow-blue-500/20 text-left">
             <PlayCircle className="mb-4" size={32} />
             <p className="font-bold text-lg lg:text-2xl leading-tight">Resume Lesson</p>
-            <p className="text-xs lg:text-sm text-blue-100 mt-1">Budgeting Basics</p>
           </button>
           <button onClick={() => setView(View.REWARDS)} className="bg-purple-600 p-6 rounded-3xl text-white shadow-lg shadow-purple-500/20 text-left">
             <Gift className="mb-4" size={32} />

@@ -4,11 +4,10 @@ import { fetchData } from "../api";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
-import Button from "@mui/material/Button";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
+import { ClipLoader } from "react-spinners";
 
 
 
@@ -58,11 +57,18 @@ export default function CoursesView(props) {
         });
     }, []);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <div className="fixed inset-0 flex items-center justify-center bg-white">
+                            <ClipLoader 
+                                color="#009689" 
+                                loading={loading} 
+                                size={150} 
+                                aria-label="Loading Spinner" 
+                                data-testid="loader" />
+                        </div>
     if (error) return <p>Error loading data!</p>;
     return (
       <div className="p-4 pb-24 space-y-6">
-        <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4 lg:justify-center lg:items-center">
+        <div className="space-y-8 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-4 lg:justify-center lg:items-center">
           <LessonCard courses={data} toggleLessonDetails={toggleLessonDetails} />
         </div>
       </div>

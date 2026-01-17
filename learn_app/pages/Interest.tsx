@@ -2,7 +2,7 @@ import { Button, ButtonGroup, TextField } from "@mui/material";
 import { ChessQueen, Crown, FlaskConical, Headset, Palette } from "lucide-react";
 
 export default function Interest(props) {
-    const {handleSubmit, toggleForm, toggleFormInterest} = props;
+    const {handleSubmit, form, toggleForm, toggleFormInterest} = props;
     return(
         <div >
             <div className="text-2xl font-bold mb-4 text-center">
@@ -10,18 +10,20 @@ export default function Interest(props) {
             </div>
             <div className="w-full rounded-3xl shadow-2xl p-8 bg-white text-gray-800 border-0 mt-6">
                 <form className = "flex flex-col gap-4" onSubmit={handleSubmit}>
-                    <ButtonGroup orientation="vertical" variant="text" aria-label="Vertical button group" >
+                    <ButtonGroup orientation="vertical" aria-label="Vertical button group" >
                         <Button  
                             style={{maxHeight: '300px', minHeight: '50px', fontSize: '14px', justifyContent: 'start', alignContent: 'center'}} 
                             className="grid grid-cols-2 gap-4 w-full"
-                            onClick={() => toggleFormInterest("Gaming")}>
+                            onClick={() => toggleFormInterest("Gaming")}
+                            variant={form.interests.includes("Gaming") ? "contained" : "text"}>
                             <Headset />
                             <div>Gaming</div>
                         </Button>
                         <Button 
                             style={{maxHeight: '300px', minHeight: '50px', fontSize: '14px', justifyContent: 'start', alignContent: 'center'}} 
                             className="grid grid-cols-2 gap-4 w-full"
-                            onClick={() => toggleFormInterest("Science")}>
+                            onClick={() => toggleFormInterest("Science")}
+                            variant={form.interests.includes("Science") ? "contained" : "text"}>
                             <FlaskConical />
                             <div>
                                 Science
@@ -30,7 +32,8 @@ export default function Interest(props) {
                         <Button 
                             style={{maxHeight: '300px', minHeight: '50px', fontSize: '14px', justifyContent: 'start', alignContent: 'center'}} 
                             className="grid grid-cols-2 gap-4 w-full"
-                            onClick={() => toggleFormInterest("Arts")}>
+                            onClick={() => toggleFormInterest("Arts")}
+                            variant={form.interests.includes("Arts") ? "contained" : "text"}>
                             <Palette />
                             <div>
                                 Arts
@@ -39,7 +42,8 @@ export default function Interest(props) {
                         <Button 
                             style={{maxHeight: '300px', minHeight: '50px', fontSize: '14px', justifyContent: 'start', alignContent: 'center'}} 
                             className="grid grid-cols-2 gap-4 w-full"
-                            onClick={() => toggleFormInterest("Western History")}>
+                            onClick={() => toggleFormInterest("Western History")}
+                            variant={form.interests.includes("Western History") ? "contained" : "text"}>
                             <ChessQueen />
                             <div>
                                 Western History
@@ -48,7 +52,8 @@ export default function Interest(props) {
                         <Button 
                             style={{maxHeight: '300px', minHeight: '50px', fontSize: '14px', justifyContent: 'start', alignContent: 'center'}} 
                             className="grid grid-cols-2 gap-4 w-full"
-                            onClick={() => toggleFormInterest("Chinese History")}>
+                            onClick={() => toggleFormInterest("Chinese History")}
+                            variant={form.interests.includes("Chinese History") ? "contained" : "text"}>
                             <Crown />
                             <div>
                                 Chinese History

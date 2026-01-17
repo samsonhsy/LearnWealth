@@ -405,7 +405,7 @@ export default function App() {
         {view === View.LOGIN && <Login loginForm={loginForm} View={View} toggleView={toggleView} handleLogin={handleLogin} toggleLogInForm={toggleLoginForm} />}
         {view === View.REGISTER && <Register View={View} toggleView={toggleView} notify={notify} />}
         {view === View.HOME && <Home user={user} setUser={setUser} eventNum = {MOCK_EVENTS.length} View={View} setView={toggleView} />}
-        {view === View.LEARN && <Learn />}
+        {view === View.LEARN && <Learn  notify={notify} />}
         {view === View.REWARDS && <RewardsView />}
         {view === View.EVENTS && <EventsView />}
       </main>

@@ -2,7 +2,8 @@ import { useState } from "react";
 import CoursesView from "./Courses";
 import CourseExpandedView from "./CourseExpanded";
 
-export default function LearnView () {
+export default function LearnView (props) {
+    const { notify } = props;
     const [lessonId, setLessonId] = useState<string | null>(null);
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -19,7 +20,7 @@ export default function LearnView () {
     return(
         <div>
             {!isExpanded && <CoursesView toggleLessonDetails={toggleLessonDetails}/>}
-            {isExpanded && <CourseExpandedView lessonId={lessonId} closeLessonDetails={closeLessonDetails}/>}
+            {isExpanded && <CourseExpandedView lessonId={lessonId} closeLessonDetails={closeLessonDetails} notify={notify}/>}
         </div>
     )
 }

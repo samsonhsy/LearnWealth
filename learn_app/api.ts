@@ -22,3 +22,14 @@ export const fetchData = async (endpoint: string) => {
     throw error;
   }
 };
+
+export const postData = async (endpoint: string) => {
+  try {
+    const response = await instance.post(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data: ', error);
+    // Handle errors here or throw them to be handled where the function is called
+    throw error;
+  }
+};

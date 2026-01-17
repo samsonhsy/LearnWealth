@@ -93,7 +93,7 @@ export default function Register(props) {
         <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-900 text-white">
             <div className="w-full max-w-md ">
                 {!isInterest && <UserInfo handleUserInfo={handleUserInfo} form={form} toggleForm={toggleForm} />}
-                {isInterest && <Interest handleSubmit={handleSubmit} toggleForm={toggleForm} toggleFormInterest={toggleFormInterest}/>}
+                {isInterest && <Interest handleSubmit={handleSubmit} form={form} toggleForm={toggleForm} toggleFormInterest={toggleFormInterest}/>}
             </div>
         </div>
 

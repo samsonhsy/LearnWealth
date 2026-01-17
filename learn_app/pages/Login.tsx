@@ -7,15 +7,6 @@ import { Link } from 'react-router-dom';
 
 export default function LoginView(props) {
     const { View, setView, handleLogin, toggleLogInForm, loginForm } = props;
-    // const [loginForm, setLoginForm] = useState({ username: '', email: '', password: '' });
-    // const [showNotification, setShowNotification] = useState<{msg: string, type: 'success' | 'error'} | null>(null);
-
-    // const notify = (msg: string, type: 'success' | 'error' = 'success') => {
-    //   setShowNotification({ msg, type });
-    //   setTimeout(() => setShowNotification(null), 3000);
-    // };
-
-
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-900 text-white">
