@@ -82,7 +82,7 @@ export default function Register(props) {
               const data = response.data;
 
               notify('User Registered Successfully', 'success');
-              toggleView(View.HOME);
+              toggleView(View.LOGIN);
             } catch(error){
               console.error("Error occurred when registering user", error);
               notify('Registration failed. Please try again.', 'error');

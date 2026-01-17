@@ -15,6 +15,11 @@ export default defineConfig(({ mode }) => {
             changeOrigin: true,
             secure: false,
           },
+          '/student': {
+            target: 'https://ctflife-demo.zeabur.app',
+            changeOrigin: true,
+            secure: false,
+          },
           '/auth': {
             target: 'https://ctflife-demo.zeabur.app',
             changeOrigin: true,

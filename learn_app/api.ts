@@ -4,11 +4,13 @@ const API_BASE_URL = 'https://ctflife-demo.zeabur.app';
 
 const instance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 1000,
+  timeout: 10000,
 });
 
-// You can add common headers or auth tokens here
-// instance.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+export function setAuthToken(token: string) {
+  instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  console.log('Auth token set for API requests');
+}
 
 export const fetchData = async (endpoint: string) => {
   try {

@@ -45,6 +45,7 @@ import Home from './pages/Home';
 import Learn from './pages/Learn';
 import axios from 'axios';
 import { log } from 'console';
+import { setAuthToken } from './api';
 
 // --- MOCK DATA ---
 export const INITIAL_USER: User = {
@@ -146,6 +147,7 @@ export default function App() {
       const token = response.data;
       console.log("Access Token:", token.access_token);
       console.log("Token Type:", token.token_type);
+      setAuthToken(token.access_token);
       notify('User Logged In Successfully', 'success');
       toggleView(View.HOME);
       // setUser({ ...INITIAL_USER, username: data.username });
@@ -402,7 +404,7 @@ export default function App() {
       <main className="max-w mx-auto min-h-screen bg-white shadow-xl relative overflow-hidden">
         {view === View.LOGIN && <Login loginForm={loginForm} View={View} toggleView={toggleView} handleLogin={handleLogin} toggleLogInForm={toggleLoginForm} />}
         {view === View.REGISTER && <Register View={View} toggleView={toggleView} notify={notify} />}
-        {view === View.HOME && <Home user={user} View={View} setView={toggleView} />}
+        {view === View.HOME && <Home user={user} setUser={setUser} eventNum = {MOCK_EVENTS.length} View={View} setView={toggleView} />}
         {view === View.LEARN && <Learn />}
         {view === View.REWARDS && <RewardsView />}
         {view === View.EVENTS && <EventsView />}
