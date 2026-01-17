@@ -43,6 +43,7 @@ import ClipLoader from "react-spinners/ClipLoader";
           </div>
         </div>
 
+        <div className="flex items-center justify-center w-full bg-gray-400" style={{height:'60px'}}>Advertisement</div>
         <div className="bg-gradient-to-br from-teal-600 to-teal-800 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
           <div className="relative z-10">
             <p className="text-teal-100 text-sm lg:text-base mb-1">K Dollar Balance</p>
